@@ -21,13 +21,23 @@ const resolveAdapter = (key: string, def: AdapterOptions): (() => AdapterResult)
 };
 
 const defineHealth = (def: HealthzDef, opts: HealthzOptions = {}): any => {
+    if (!opts.timeout) {
+        opts.timeout = 5000;
+    }
     return customs(
             Object.keys(def).map(key => resolveAdapter(key, def[key])),
             opts.timeout
         )
         .then(results => {
             return {
-                result: Object.keys(def).map((key, i) => {
+                tldr: Object.keys(def).map((key, i) => [key, def[key], results[i]])
+                    .reduce((status, [key, { crucial }, { health }]) => {
+                        if (status === Health.OK && crucial && health !== Health.OK) {
+                            return Health.NOT_OK;
+                        }
+                        return status;
+                    }, Health.OK),
+                checkers: Object.keys(def).map((key, i) => {
                     return [key, results[i]];
                 })
                     .reduce((acc, [key, result]) => {
@@ -43,10 +53,10 @@ export default defineHealth;
 
 export const healthz = (def: HealthzDef, opts: HealthzOptions) => {
     return (req, res) => {
-        const { timeout } = url.parse(req.url, true).query;
+        const query = url.parse(req.url, true).query;
         const specOpts = { ...opts };
-        if (!isNaN(parseInt(timeout))) {
-            specOpts.timeout = parseInt(timeout);
+        if (query && ('timeout' in query)) {
+            specOpts.timeout = parseInt(query.timeout);
         }
         return defineHealth(def, specOpts)
             .then(result => {

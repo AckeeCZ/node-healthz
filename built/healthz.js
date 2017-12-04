@@ -27,10 +27,21 @@ var resolveAdapter = function (key, def) {
 };
 var defineHealth = function (def, opts) {
     if (opts === void 0) { opts = {}; }
+    if (!opts.timeout) {
+        opts.timeout = 5000;
+    }
     return customs_1.default(Object.keys(def).map(function (key) { return resolveAdapter(key, def[key]); }), opts.timeout)
         .then(function (results) {
         return {
-            result: Object.keys(def).map(function (key, i) {
+            tldr: Object.keys(def).map(function (key, i) { return [key, def[key], results[i]]; })
+                .reduce(function (status, _a) {
+                var key = _a[0], crucial = _a[1].crucial, health = _a[2].health;
+                if (status === types_1.Health.OK && crucial && health !== types_1.Health.OK) {
+                    return types_1.Health.NOT_OK;
+                }
+                return status;
+            }, types_1.Health.OK),
+            checkers: Object.keys(def).map(function (key, i) {
                 return [key, results[i]];
             })
                 .reduce(function (acc, _a) {
@@ -45,10 +56,10 @@ var defineHealth = function (def, opts) {
 exports.default = defineHealth;
 exports.healthz = function (def, opts) {
     return function (req, res) {
-        var timeout = url.parse(req.url, true).query.timeout;
+        var query = url.parse(req.url, true).query;
         var specOpts = __assign({}, opts);
-        if (!isNaN(parseInt(timeout))) {
-            specOpts.timeout = parseInt(timeout);
+        if (query && ('timeout' in query)) {
+            specOpts.timeout = parseInt(query.timeout);
         }
         return defineHealth(def, specOpts)
             .then(function (result) {

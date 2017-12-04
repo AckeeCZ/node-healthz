@@ -6,6 +6,7 @@ export enum Adapter {
 export enum Health {
     OK = 'OK',
     NOT_OK = 'NOT_OK',
+    UNKNOWN = 'UNKNOWN',
     TIMEOUT = 'TIMEOUT',
     ERROR = 'ERROR',
 }

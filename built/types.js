@@ -9,6 +9,7 @@ var Health;
 (function (Health) {
     Health["OK"] = "OK";
     Health["NOT_OK"] = "NOT_OK";
+    Health["UNKNOWN"] = "UNKNOWN";
     Health["TIMEOUT"] = "TIMEOUT";
     Health["ERROR"] = "ERROR";
 })(Health = exports.Health || (exports.Health = {}));
