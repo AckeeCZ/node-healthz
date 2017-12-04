@@ -2,10 +2,12 @@
   "name": "ackee-node-healthz",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "built/index.js",
   "scripts": {
+    "dev": "",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "types": "built/index.d.ts",
   "author": "",
   "license": "ISC"
 }
