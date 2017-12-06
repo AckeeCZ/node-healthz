@@ -62,10 +62,10 @@ export const healthz = (def: HealthzDef, opts: HealthzOptions) => {
         }
         return defineHealth(def, specOpts)
             .then(result => {
-                if (result.tldr !== Health.OK) {
-                    res.statusCode = 500;
-                }
-                res.writeHead(200, {
+                const statusCode = result.tldr === Health.OK
+                    ? 200
+                    : 500;
+                res.writeHead(statusCode, {
                     'Content-type': 'application/json'
                 });
                 res.write(JSON.stringify(result));
