@@ -5,9 +5,11 @@ import * as url from 'url';
 import customs from './adapters/customs';
 import { Adapter, Health, AdapterOptions, AdapterResult, HealthzDef, HealthzOptions } from './types';
 import knex from './adapters/knex';
+import mongoose from './adapters/mongoose';
 
 const adapterTypeMap = {
     [Adapter.KNEX]: knex,
+    [Adapter.MONGOOSE]: mongoose,
 };
 
 const resolveAdapter = (key: string, def: AdapterOptions): (() => AdapterResult) => {

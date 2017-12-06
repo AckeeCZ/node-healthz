@@ -13,8 +13,10 @@ var url = require("url");
 var customs_1 = require("./adapters/customs");
 var types_1 = require("./types");
 var knex_1 = require("./adapters/knex");
+var mongoose_1 = require("./adapters/mongoose");
 var adapterTypeMap = (_a = {},
     _a[types_1.Adapter.KNEX] = knex_1.default,
+    _a[types_1.Adapter.MONGOOSE] = mongoose_1.default,
     _a);
 var resolveAdapter = function (key, def) {
     if (adapterTypeMap[def.type]) {
