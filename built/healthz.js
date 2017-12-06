@@ -76,14 +76,5 @@ exports.healthz = function (def, opts) {
         });
     };
 };
-defineHealth({
-    a: {
-        customCheck: function () { return new Promise(function (resolve) { return setTimeout(resolve, 1000); }); },
-    },
-    b: {
-        customCheck: function () { return new Promise(function (resolve) { return setTimeout(resolve, 2000); }); },
-    }
-}, { timeout: 3000 })
-    .then(console.log);
 var _a;
 //# sourceMappingURL=healthz.js.map
