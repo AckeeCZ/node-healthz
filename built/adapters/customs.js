@@ -20,14 +20,14 @@ exports.default = function (fns, timeout) {
             resolve(results.map(function (x) {
                 return __assign({}, x, { t: Array.isArray(x.t)
                         ? Math.round(tToMs(x.t)) + "ms"
-                        : x.t, health: x.health === types_1.Health.UNKNOWN
+                        : Math.round(x.t) + "ms", health: x.health === types_1.Health.UNKNOWN
                         ? types_1.Health.TIMEOUT
                         : x.health });
             }));
         };
         var setResponse = function (i, _a) {
             var health = _a.health, error = _a.error, result = _a.result;
-            return results[i] = __assign({}, results[i], { health: health, error: error, result: result });
+            return results[i] = __assign({}, results[i], { health: health, error: error, result: result, t: tToMs(results[i].t) });
         };
         var clock = setTimeout(respond, timeout);
         return Promise.all(fns.map(function (fn, i) {

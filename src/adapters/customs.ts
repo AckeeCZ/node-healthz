@@ -16,7 +16,7 @@ export default (fns: Array<() => AdapterResult>, timeout: number): Promise<any> 
                     ...x,
                     t: Array.isArray(x.t)
                         ? `${Math.round(tToMs(x.t))}ms`
-                        : x.t,
+                        : `${Math.round(x.t)}ms`,
                     health: x.health === Health.UNKNOWN
                         ? Health.TIMEOUT
                         : x.health,
@@ -24,7 +24,7 @@ export default (fns: Array<() => AdapterResult>, timeout: number): Promise<any> 
             }));
         };
         const setResponse = (i, { health, error, result }) => {
-            return results[i] = { ...results[i], health, error, result };
+            return results[i] = { ...results[i], health, error, result, t: tToMs(results[i].t) };
         };
         const clock = setTimeout(respond, timeout);
         return Promise.all(

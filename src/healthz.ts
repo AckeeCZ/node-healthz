@@ -73,3 +73,13 @@ export const healthz = (def: HealthzDef, opts: HealthzOptions) => {
             });
     }
 }
+
+defineHealth({
+    a: {
+        customCheck: () => new Promise(resolve => setTimeout(resolve, 1000)),
+    },
+    b: {
+        customCheck: () => new Promise(resolve => setTimeout(resolve, 2000)),
+    }
+}, { timeout: 3000})
+    .then(console.log)
