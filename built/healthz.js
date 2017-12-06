@@ -65,7 +65,7 @@ exports.healthz = function (def, opts) {
         }
         return defineHealth(def, specOpts)
             .then(function (result) {
-            if (result.tldr !== types_1.Health.NOT_OK) {
+            if (result.tldr !== types_1.Health.OK) {
                 res.statusCode = 500;
             }
             res.writeHead(200, {

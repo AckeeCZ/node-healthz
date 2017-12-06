@@ -62,7 +62,7 @@ export const healthz = (def: HealthzDef, opts: HealthzOptions) => {
         }
         return defineHealth(def, specOpts)
             .then(result => {
-                if (result.tldr !== Health.NOT_OK) {
+                if (result.tldr !== Health.OK) {
                     res.statusCode = 500;
                 }
                 res.writeHead(200, {
