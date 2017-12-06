@@ -2,7 +2,10 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = function (mongoose, def) {
     return new Promise(function (_resolve, _reject) {
-        mongoose.connection.db.command({ ping: 1 }, { failFast: true }, function (err) {
+        var db = mongoose.connection
+            ? mongoose.connection.db // prev versions
+            : mongoose.db; // current versions
+        db.command({ ping: 1 }, { failFast: true }, function (err) {
             if (err) {
                 return _reject(err);
             }
