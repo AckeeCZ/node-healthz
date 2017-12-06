@@ -1,5 +1,6 @@
 import { Adapter, Health, AdapterOptions, AdapterResult } from '../types';
 declare const Promise: any;
+declare const process: any;
 
 const tToMs = (pt) => {
     const t = process.hrtime(pt);
