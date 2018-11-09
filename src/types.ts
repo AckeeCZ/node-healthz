@@ -22,11 +22,3 @@ export interface AdapterOptions {
 export interface AdapterResult {
     
 }
-    
-export interface HealthzDef {
-    [key: string]: AdapterOptions
-}
-
-export interface HealthzOptions {
-    timeout?: number;
-}

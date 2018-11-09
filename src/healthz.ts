@@ -1,16 +1,17 @@
-/// <reference types="node" />
-declare const Promise: any;
-
 import * as url from 'url';
 import customs from './adapters/customs';
-import { Adapter, Health, AdapterOptions, AdapterResult, HealthzDef, HealthzOptions } from './types';
 import knex from './adapters/knex';
 import mongoose from './adapters/mongoose';
+import { Adapter, AdapterOptions, AdapterResult, Health, HealthzDef, HealthzOptions } from './types';
 
-const adapterTypeMap = {
-    [Adapter.KNEX]: knex,
-    [Adapter.MONGOOSE]: mongoose,
-};
+
+export namespace AdapterType {
+    export type AdapterTypeEnum = 'knex' | 'mongoose';
+    export const AdapterTypeEnum = {
+        Knex: 'knex' as AdapterTypeEnum,
+        Mongoose: 'mongoose' as AdapterTypeEnum,
+    };
+}
 
 const resolveAdapter = (key: string, def: AdapterOptions): (() => AdapterResult) => {
     if (adapterTypeMap[def.type]) {
@@ -22,7 +23,19 @@ const resolveAdapter = (key: string, def: AdapterOptions): (() => AdapterResult)
     return null;
 };
 
-const defineHealth = (def: HealthzDef, opts: HealthzOptions = {}): any => {
+interface HealthzDefinition {
+    [key: string]: AdapterOptions;
+};
+
+interface HealthzOptions {
+    timeout?: number;
+}
+
+interface Health {
+    tldr: 
+};
+
+const defineHealth = (definition?: HealthzDefinition, options?: HealthzOptions): Promise<> => {
     if (!opts.timeout) {
         opts.timeout = 5000;
     }
