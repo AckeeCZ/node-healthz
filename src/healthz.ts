@@ -184,7 +184,7 @@ export const healthz = <Req extends express.Request, Res extends express.Respons
         const query = url.parse(req.url, true).query;
         const specOpts = { ...opts } as Partial<HealthzOptions>;
         if (query && ('timeout' in query)) {
-            specOpts.timeout = parseInt(query.timeout);
+            specOpts.timeout = parseInt(String(query.timeout), 10);
         }
         return defineHealth(def, specOpts)
             .then(result => {
