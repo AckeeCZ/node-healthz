@@ -1,21 +1,23 @@
 import * as express from 'express';
-import defineHealth, { healthz } from './healthz';
-import { Adapter, HealthzDef, HealthzOptions } from './types';
+import defineHealth, { healthz, HealthzDefinition, HealthzOptions, AdapterType } from './healthz';
 
 export default healthz;
+
+export {
+    AdapterType
+}
 
 const expressMiddleware = <
     Req extends express.Request,
     Res extends express.Response,
     Next extends express.NextFunction
->(def: HealthzDef, opts: HealthzOptions) =>
-    (req: Req, res: Res, next: Next) => { 
+>(def: HealthzDefinition , opts?: HealthzOptions) =>
+    ((req: Req, res: Res, next: Next) => { 
         if (/^\/healthz/.test(req.url)) {
             healthz(def, opts)(req, res);
         } else {
             next();
         }
-    }
+    }) as express.RequestHandler
 
-export { healthz, Adapter, defineHealth, expressMiddleware, };
-
+export { healthz, defineHealth, expressMiddleware, };

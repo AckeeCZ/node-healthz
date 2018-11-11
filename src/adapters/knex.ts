@@ -1,7 +1,5 @@
-import { AdapterOptions } from '../types';
-declare const Promise: any;
+import { AdapterOptions } from 'healthz';
 
 export default (knex: any, def: AdapterOptions) => {
-    return knex.raw('show status')
-        .then(() => undefined);
+    return knex.raw('show status');
 };
