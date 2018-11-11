@@ -119,7 +119,7 @@ workflows:
       - publish:
           requires:
             - build
-            - test
+            # - test
           filters:
             tags:
               only: /^v.*/
