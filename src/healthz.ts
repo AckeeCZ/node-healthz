@@ -10,6 +10,7 @@ export interface AdapterOptions {
     customCheck?: Check;
     check?: Check;
     timeout: number;
+    ignoreResult: boolean,
 }
 
 export type AdapterType = 'knex' | 'mongoose';
@@ -78,19 +79,29 @@ const getChecker = (adapterOptions: Partial<AdapterOptions>, healthzOptions: Hea
     const adapterOpts: AdapterOptions = {
         timeout: healthzOptions.timeout,
         crucial: false,
+        ignoreResult: healthzOptions.ignoreResults,
         ...(adapterOptions || {}),
     };
 
-    if (adapterMap[adapterOptions.type!]) {
-        return () => adapterMap[adapterOptions.type!](adapterOptions.adapter, adapterOpts);
+    const check = (() => {
+        if (adapterMap[adapterOptions.type!]) {
+            return () => adapterMap[adapterOptions.type!](adapterOptions.adapter, adapterOpts);
+        }
+        if (adapterOptions.customCheck) {
+            return () => adapterOptions.customCheck!(adapterOpts);
+        }
+        if (adapterOptions.check) {
+            return () => adapterOptions.check!(adapterOpts);
+        }
+        throw new TypeError('Unsupported adapter type and no custom `check` function supplied');
+    })();
+    if (!adapterOpts.ignoreResult) {
+        return check;
     }
-    if (adapterOptions.customCheck) {
-        return () => adapterOptions.customCheck!(adapterOpts);
-    }
-    if (adapterOptions.check) {
-        return () => adapterOptions.check!(adapterOpts);
-    }
-    throw new TypeError('Unsupported adapter type and no custom `check` function supplied');
+    return async () => {
+        await check();
+        return '<ignored>';
+    };
 }
 
 const defineHealth = async (definition?: HealthzDefinition, options: Partial<HealthzOptions> = defaults) => {
