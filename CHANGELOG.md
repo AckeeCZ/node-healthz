@@ -1,6 +1,8 @@
 # Changelog
 
-## [Unreleased] - 2024-05-03
+## [Unreleased]
+
+## [2.0.0-rc.2] 2024-05-04
 
 ### Added
 - Changelog

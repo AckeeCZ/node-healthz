@@ -1,5 +1,8 @@
 # node-healthz
 
+![HTML Preview](https://raw.githubusercontent.com/smoliji/node-healthz/fc4aad102264fe4241cbf3b0c02edfd3a2eb3af5/html-preview.png "node-healthz HTML Preview")
+
+
 The "health-checkup" npm package simplifies the process of implementing health checks in Node.js applications, allowing you to ensure the reliability and availability of your system components effortlessly.
 
 ```ts
