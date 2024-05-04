@@ -3,8 +3,10 @@ on:
   release:
     types: [published]
 jobs:
-  build:
+  release:
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4

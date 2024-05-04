@@ -1,6 +1,6 @@
 {
   "name": "node-healthz",
-  "version": "2.0.0",
+  "version": "2.0.0-rc.1",
   "description": "The \"health-checkup\" npm package simplifies the process of implementing health checks in Node.js applications, allowing you to ensure the reliability and availability of your system components effortlessly.",
   "keywords": [
     "nodejs",
@@ -24,10 +24,7 @@
     "build": "esbuild src/index.ts --bundle --minify --platform=node --outfile=dist/index.js && tsc",
     "test": "node --require ts-node/register --require source-map-support/register --test **/*.test.ts"
   },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/smoliji/node-healthz.git"
-  },
+  "repository": "git+https://github.com/smoliji/node-healthz.git",
   "engines": {
     "node": ">=16"
   },
