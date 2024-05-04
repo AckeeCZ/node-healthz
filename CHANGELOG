@@ -1,0 +1,15 @@
+# Changelog
+
+## [Unreleased] - 2024-05-03
+
+### Added
+- Changelog
+- Tests
+- ExpressJS demo
+- Basic healthz functionality
+- HTML and JSON preview
+- Build & minification with esbuild
+- GitHub actions
+
+### Removed
+- Everything

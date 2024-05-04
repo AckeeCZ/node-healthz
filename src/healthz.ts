@@ -1,212 +1,154 @@
-import * as express from 'express';
-import * as url from 'url';
-import knex from './adapters/knex';
-import mongoose from './adapters/mongoose';
+export type Healthz = () => Promise<Result>
 
-export interface AdapterOptions {
-    type?: AdapterType;
-    adapter?: any;
-    crucial: boolean;
-    customCheck?: Check;
-    check?: Check;
-    timeout: number;
-    ignoreResult: boolean,
+export enum Status {
+  Healthy,
+  Unhealthy,
 }
 
-export type AdapterType = 'knex' | 'mongoose';
-export const AdapterType = {
-    Knex: 'knex' as AdapterType,
-    Mongoose: 'mongoose' as AdapterType,
-};
-
-export interface Health {
-    tldr: HealthState;
+export interface Config {
+  checks: Array<{
+    id: string
+    required: boolean
+    fn: () => Promise<unknown>
+    maskOutput: boolean
+  }>
+  timeout: number
 }
 
-export type HealthState = 'OK' | 'NOT_OK' | 'UNKNOWN' | 'TIMEOUT' | 'ERROR';
-export const HealthState = {
-    OK: 'OK' as HealthState,
-    NOT_OK: 'NOT_OK' as HealthState,
-    UNKNOWN: 'UNKNOWN' as HealthState,
-    TIMEOUT: 'TIMEOUT' as HealthState,
-    ERROR: 'ERROR' as HealthState,
-};
-
-export interface HealthzDefinition {
-    [key: string]: Partial<AdapterOptions>;
-};
-
-export interface HealthzOptions {
-    timeout: number;
-    ignoreResults: boolean,
+export interface Result {
+  status: Status
+  checks: CheckResult[]
 }
 
-const defaults: HealthzOptions = {
-    timeout: 5000,
-    ignoreResults: true,
-};
-
-
-const stopwatch = {
-    // see https://nodejs.org/api/process.html#process_process_hrtime_time for details
-    start: () => {
-        return <[number, number]>process.hrtime();
-    },
-    stop: (te: [number, number]): number => {
-        const t = process.hrtime(te);
-        return (t[0] + t[1] * 1e-9) * 1e3;
-    },
-};
-const ms = (t: number) => `${Math.round(t)}ms`;
-
-const adapterMap = {
-    [AdapterType.Knex]: knex,
-    [AdapterType.Mongoose]: mongoose,
-};
-
-export type Check = ((adapterOptions: AdapterOptions) => any)
-    // | ((adapter: any, adapterOptions: AdapterOptions) => any);
+export enum CheckStatus {
+  Ok,
+  Error,
+  Timeout,
+}
 
 export interface CheckResult {
-    name: string;
-    result: null | any;
-    error: null | string;
-    t: null | string | number[];
-    health: HealthState,
+  id: string
+  status: CheckStatus
+  output: unknown
+  rawOutput: unknown
+  required: boolean
+  /**
+   * Milliseconds it took the check to finish. Wall clock time.
+   */
+  latency: number
 }
 
-const getChecker = (adapterOptions: Partial<AdapterOptions>, healthzOptions: HealthzOptions) => {
-    const adapterOpts: AdapterOptions = {
-        timeout: healthzOptions.timeout,
-        crucial: false,
-        ignoreResult: healthzOptions.ignoreResults,
-        ...(adapterOptions || {}),
-    };
-
-    const check = (() => {
-        if (adapterMap[adapterOptions.type!]) {
-            return () => adapterMap[adapterOptions.type!](adapterOptions.adapter, adapterOpts);
-        }
-        if (adapterOptions.customCheck) {
-            return () => adapterOptions.customCheck!(adapterOpts);
-        }
-        if (adapterOptions.check) {
-            return () => adapterOptions.check!(adapterOpts);
-        }
-        throw new TypeError('Unsupported adapter type and no custom `check` function supplied');
-    })();
-    if (!adapterOpts.ignoreResult) {
-        return check;
-    }
-    return async () => {
-        await check();
-        return '<ignored>';
-    };
+export interface Option {
+  /**
+   * Array of health checks.
+   */
+  checks?: Array<{
+    /**
+     * Unique identifier of the check.
+     * There cannot be multiple checks with the same ID.
+     */
+    id: string
+    /**
+     * Health check function.
+     */
+    fn: () => Promise<unknown>
+    /**
+     * Boolean that if any health check with TRUE fails, entire health check
+     * is considered as Unhealthy.
+     * @default false
+     */
+    required?: boolean
+    /**
+     * Boolean that if TRUE, check output will be masked and the return/thrown
+     * value from the `fn` won't be used.
+     * @default true
+     */
+    maskOutput?: boolean
+  }>
+  /**
+   * How many milliseconds to wait for the check to complete. It if fails
+   * to finish within this time, check status will be Timeout.
+   * @default 10_000
+   **/
+  timeout?: number
 }
 
-const defineHealth = async (definition?: HealthzDefinition, options: Partial<HealthzOptions> = defaults) => {
-    const opts: HealthzOptions = {
-        ...defaults,
-        ...(options || {}),
-    };
-    const checkers = Object.keys(definition || {})
-        .map(key => ({ name: key, check: getChecker(definition![key], opts) }));
-
-    const tStart = stopwatch.start();
-    const checkersHealth = await (new Promise(resolve => {
-        const results: CheckResult[] = checkers.map(({ name }) => (
-            {
-                name,
-                result: null,
-                error: null,
-                t: null,
-                health: HealthState.UNKNOWN,
-                crucial: !!definition![name].crucial,
-            }
-        ));
-    
-        const clock = setTimeout(
-            () => resolve(
-                results.map(result => ({
-                    ...result,
-                    health: result.health === HealthState.UNKNOWN
-                        ? HealthState.TIMEOUT
-                        : result.health,
-                    t: result.t == null ? ms(stopwatch.stop(tStart)) : result.t,
-                }))
-            ),
-            opts.timeout
-        );
-
-        const setResponse = (i: number, health: HealthState, error: string | null, result: any, t: string) => {
-            return results[i] = { ...results[i], health, error, result, t };
-        }
-        Promise.all(
-            checkers.map(
-                async (checker, i) => {
-                    const t = stopwatch.start();
-                    let health = HealthState.OK
-                    let result = null;
-                    let error = null;
-                    try {
-                        result = await checker.check();
-                    } catch (caught) {
-                        error = caught.message;
-                        health = HealthState.ERROR;
-                    }
-                    setResponse(i, health, error, result, ms(stopwatch.stop(t)));
-                }
-            )
-        )
-            .then(() => {
-                clearTimeout(clock);
-                resolve(results);
-            });
-    }) as Promise<CheckResult[]>);
-    return {
-        tldr: Object.keys(definition!)
-            .reduce(
-                (status, checker, i) => {
-                    const health = checkersHealth[i].health;
-                    const crucial = definition![checker].crucial;
-                    if (status === HealthState.OK && crucial && health !== HealthState.OK) {
-                        return HealthState.NOT_OK;
-                    }
-                    return status;
-                },
-                HealthState.OK
-            ),
-        t: ms(stopwatch.stop(tStart)),
-        checkers: checkersHealth
-            .reduce(
-                (acc, { name, ...rest }) => {
-                    acc[name] = rest;
-                    return acc;
-                },
-                {} as any),
-        options,
-    }
+export function createConfig(option?: Option): Config {
+  return {
+    checks:
+      option?.checks?.map((x) => ({
+        id: x.id,
+        required: x.required ?? false,
+        fn: x.fn,
+        maskOutput: x.maskOutput ?? true,
+      })) ?? [],
+    timeout: option?.timeout ?? 5_000,
+  }
 }
 
-export default defineHealth;
+export function check(option?: Option) {
+  const config = createConfig(option)
+  return checkForConfig(config)
+}
 
-export const healthz = <Req extends express.Request, Res extends express.Response>(def: HealthzDefinition, opts?: Partial<HealthzOptions>) => {
-    return (req: Req, res: Res) => {
-        const query = url.parse(req.url, true).query;
-        const specOpts = { ...opts } as Partial<HealthzOptions>;
-        if (query && ('timeout' in query)) {
-            specOpts.timeout = parseInt(String(query.timeout), 10);
-        }
-        return defineHealth(def, specOpts)
-            .then(result => {
-                const statusCode = result.tldr === HealthState.OK
-                    ? 200
-                    : 500;
-                res.writeHead(statusCode, {
-                    'Content-type': 'application/json'
-                });
-                res.write(JSON.stringify(result));
-                res.end();
-            });
-    }
+type RawCheckResult = Pick<CheckResult, 'latency' | 'rawOutput' | 'status'>
+
+async function checkForConfig(config: Config): Promise<Result> {
+  const t0 = Date.now()
+  const timeout = createTimeout(config.timeout)
+  const results = await Promise.all(
+    config.checks.map((x) =>
+      Promise.race<RawCheckResult>([
+        x
+          .fn()
+          .then<RawCheckResult>((rawOutput) => ({
+            status: CheckStatus.Ok,
+            rawOutput,
+            latency: Date.now() - t0,
+          }))
+          .catch<RawCheckResult>((rawOutput) => ({
+            status: CheckStatus.Error,
+            rawOutput,
+            latency: Date.now() - t0,
+          })),
+        timeout.promise,
+      ]),
+    ),
+  )
+  timeout.clear()
+  return {
+    status: results.find(
+      (x, i) => config.checks[i].required && x.status !== CheckStatus.Ok,
+    )
+      ? Status.Unhealthy
+      : Status.Healthy,
+    checks: config.checks.map((x, i) => ({
+      id: x.id,
+      status: results[i].status,
+      output: x.maskOutput ? '<masked>' : results[i].rawOutput,
+      rawOutput: results[i].rawOutput,
+      latency: results[i].latency,
+      required: x.required,
+    })),
+  }
+}
+
+function createTimeout(ms: number) {
+  let ref: NodeJS.Timeout
+  return {
+    promise: new Promise<RawCheckResult>((resolve) => {
+      ref = setTimeout(
+        () =>
+          resolve({
+            status: CheckStatus.Timeout,
+            rawOutput: undefined,
+            latency: ms,
+          }),
+        ms,
+      )
+    }),
+    clear() {
+      clearTimeout(ref)
+    },
+  }
 }
