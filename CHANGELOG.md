@@ -2,6 +2,9 @@
 
 ## [Unreleased]
 
+### Removed
+- Drop Node.js 16 support
+
 ## [2.0.0-rc.4] 2024-05-05
 
 ## [2.0.0-rc.3] 2024-05-05
