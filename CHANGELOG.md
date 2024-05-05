@@ -2,6 +2,9 @@
 
 ## [Unreleased]
 
+### Added
+- Custom path for Express.js
+
 ### Removed
 - Drop Node.js 16 support
 

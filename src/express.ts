@@ -4,6 +4,12 @@ import { htmlResult, jsonResult } from './http'
 
 export interface Option extends HOption {
   transformResult?: (result: Result) => Result
+  /**
+   * Pathname on which the healthz should be accessible.
+   *
+   * @default /healthz
+   **/
+  path?: string
 }
 
 type Request = {
@@ -24,9 +30,10 @@ export function middleware<Req extends Request, Res extends Response>(
 ) {
   const transformResult: Option['transformResult'] =
     option?.transformResult ?? ((x) => x)
+  const path = option?.path ?? '/healthz'
   return async function healthzmw(req: Req, res: Res, next: any) {
     try {
-      if (req.path !== '/healthz') {
+      if (req.path !== path) {
         return next()
       }
       const health = transformResult(
