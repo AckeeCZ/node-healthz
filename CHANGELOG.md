@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [2.0.0-rc.3] 2024-05-05
+
 ### Added
 - Express.js middleware
 
