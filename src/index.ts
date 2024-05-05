@@ -13,3 +13,6 @@ export {
   jsonResult as json,
   resultStatusCode as status,
 } from './http'
+export {
+  middleware as express
+} from './express'

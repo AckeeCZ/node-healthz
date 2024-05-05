@@ -45,4 +45,5 @@ curl http://localhost:46461/healthz --verbose | jq
 
 ### Guides
 
-- [How to use with ExpressJS](./demo/express.ts)
+- [How to use as ExpressJS middleware](./demo/express-mw.ts)
+- [How to use Core with ExpressJS](./demo/express.ts)

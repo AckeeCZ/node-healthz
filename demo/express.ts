@@ -36,4 +36,4 @@ app.use('/healthz', async (req, res, next) => {
 
 const running = app.listen(process.env.PORT ?? 0)
 const port = (running.address() as any).port
-console.log(`Express app running on http://localhost:${port}`)
+console.log(`Express app running on http://localhost:${port}/healthz`)
