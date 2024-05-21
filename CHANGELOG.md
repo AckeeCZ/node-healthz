@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+### [2.0.0] 2024-05-21
+
 ### Added
 - Custom path for Express.js
 
@@ -9,6 +11,9 @@
 - Drop Node.js 16 support
 
 ## [2.0.0-rc.4] 2024-05-05
+
+### Note
+- This release was made by mistake due to a configuration error with the publishing mechanism. No changes or new features are included in this version.
 
 ## [2.0.0-rc.3] 2024-05-05
 
