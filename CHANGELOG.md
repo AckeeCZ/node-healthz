@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+### [2.0.1] 2024-05-31
+
 ### Added
 
 - Reg. exp. support for custom Express.js path
