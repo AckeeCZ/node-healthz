@@ -9,7 +9,7 @@ export interface Option extends HOption {
    *
    * @default /healthz
    **/
-  path?: string
+  path?: string | RegExp
 }
 
 type Request = {
@@ -30,10 +30,10 @@ export function middleware<Req extends Request, Res extends Response>(
 ) {
   const transformResult: Option['transformResult'] =
     option?.transformResult ?? ((x) => x)
-  const path = option?.path ?? '/healthz'
+  const match = routeMatcher(option?.path ?? '/healthz')
   return async function healthzmw(req: Req, res: Res, next: any) {
     try {
-      if (req.path !== path) {
+      if (!match(req)) {
         return next()
       }
       const health = transformResult(
@@ -54,4 +54,14 @@ export function middleware<Req extends Request, Res extends Response>(
       next(error)
     }
   }
+}
+
+function routeMatcher(matcher: RegExp | string): (req: Request) => boolean {
+  if (typeof matcher === 'string') {
+    return (req: Request) => req.path === matcher
+  }
+  if (matcher instanceof RegExp) {
+    return (req: Request) => matcher.test(req.path)
+  }
+  throw new Error('Unsupported route matcher')
 }
