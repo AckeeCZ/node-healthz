@@ -1,6 +1,6 @@
 import test, { describe } from 'node:test'
 import { htmlResult, jsonResult, resultStatusCode } from './http'
-import { CheckStatus, Status } from './healthz'
+import { CheckStatus, LatencyStatus, Status } from './healthz'
 import { deepEqual, equal } from 'node:assert'
 
 describe('http', () => {
@@ -31,6 +31,7 @@ describe('http', () => {
             rawOutput: 'ro',
             required: true,
             status: CheckStatus.Ok,
+            latencyStatus: LatencyStatus.Medium,
           },
         ],
         status: Status.Healthy,
@@ -59,6 +60,7 @@ describe('http', () => {
           rawOutput: 'ro',
           required: true,
           status: CheckStatus.Ok,
+          latencyStatus: LatencyStatus.Medium,
         },
       ],
       status: Status.Healthy,

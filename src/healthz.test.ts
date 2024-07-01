@@ -1,6 +1,6 @@
 import test, { describe } from 'node:test'
-import { Status, createConfig, check } from './healthz'
-import { equal } from 'node:assert'
+import { Status, createConfig, check, LatencyStatus } from './healthz'
+import { deepEqual, equal } from 'node:assert'
 
 describe('healthz', () => {
   test('Health check results are masked by default', async () => {
@@ -52,5 +52,34 @@ describe('healthz', () => {
       ],
     })
     equal(result.status, Status.Healthy)
+  })
+  test('Latency status thresholds can be set and are 100 and 500 by default', async () => {
+    deepEqual(
+      createConfig({ checks: [{ fn: async () => '', id: 'test' }] }).checks[0]
+        .latencyLevels,
+      [100, 500],
+    )
+    const result = await check({
+      checks: [
+        {
+          id: 'check',
+          fn: () => new Promise((resolve) => setTimeout(resolve, 10)),
+          latencyLevents: [20, 120],
+        },
+        {
+          id: 'check',
+          fn: () => new Promise((resolve) => setTimeout(resolve, 100)),
+          latencyLevents: [20, 120],
+        },
+        {
+          id: 'check',
+          fn: () => new Promise((resolve) => setTimeout(resolve, 200)),
+          latencyLevents: [20, 120],
+        },
+      ],
+    })
+    equal(result.checks[0].latencyStatus, LatencyStatus.Low)
+    equal(result.checks[1].latencyStatus, LatencyStatus.Medium)
+    equal(result.checks[2].latencyStatus, LatencyStatus.High)
   })
 })
