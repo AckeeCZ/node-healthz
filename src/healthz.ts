@@ -11,6 +11,7 @@ export interface Config {
     required: boolean
     fn: () => Promise<unknown>
     maskOutput: boolean
+    latencyLevels: [number, number]
   }>
   timeout: number
 }
@@ -36,6 +37,7 @@ export interface CheckResult {
    * Milliseconds it took the check to finish. Wall clock time.
    */
   latency: number
+  latencyStatus: LatencyStatus
 }
 
 export interface Option {
@@ -64,6 +66,13 @@ export interface Option {
      * @default true
      */
     maskOutput?: boolean
+    /**
+     * Latency levels for Low, Medium and High latency.
+     * It is expected that [0] < [1]. For example `latency < [0]` -> Low,
+     * `latency >= [0] && latency < [1]` -> medium, everything else is High
+     * @default [100, 500]
+     */
+    latencyLevents?: [number, number]
   }>
   /**
    * How many milliseconds to wait for the check to complete. It if fails
@@ -81,6 +90,7 @@ export function createConfig(option?: Option): Config {
         required: x.required ?? false,
         fn: x.fn,
         maskOutput: x.maskOutput ?? true,
+        latencyLevels: x.latencyLevents ?? [100, 500],
       })) ?? [],
     timeout: option?.timeout ?? 5_000,
   }
@@ -92,6 +102,12 @@ export function check(option?: Option) {
 }
 
 type RawCheckResult = Pick<CheckResult, 'latency' | 'rawOutput' | 'status'>
+
+export enum LatencyStatus {
+  Low,
+  Medium,
+  High,
+}
 
 async function checkForConfig(config: Config): Promise<Result> {
   const t0 = Date.now()
@@ -129,8 +145,15 @@ async function checkForConfig(config: Config): Promise<Result> {
       rawOutput: results[i].rawOutput,
       latency: results[i].latency,
       required: x.required,
+      latencyStatus: latencyStatus(x.latencyLevels, results[i].latency)
     })),
   }
+}
+
+function latencyStatus(levels: [number, number], latency: number): LatencyStatus {
+  if (latency < levels[0]) return LatencyStatus.Low
+  if (latency < levels[1]) return LatencyStatus.Medium
+  return LatencyStatus.High
 }
 
 function createTimeout(ms: number) {
