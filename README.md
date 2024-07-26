@@ -1,9 +1,15 @@
+<div align="center">
+  <img src="https://raw.githubusercontent.com/AckeeCZ/node-healthz/016721b2217d779ac04965192aaeb8644f1ea460/asset/logo.png" height="100">
+</div>
+
+
 # node-healthz
 
-![HTML Preview](https://raw.githubusercontent.com/AckeeCZ/node-healthz/837e9351f326efeca2f46e64fc650899ad6befa8/html-preview.png "node-healthz HTML Preview")
 
 
 The "health-checkup" npm package simplifies the process of implementing health checks in Node.js applications, allowing you to ensure the reliability and availability of your system components effortlessly.
+
+![HTML Preview](https://raw.githubusercontent.com/AckeeCZ/node-healthz/837e9351f326efeca2f46e64fc650899ad6befa8/html-preview.png "node-healthz HTML Preview")
 
 ```ts
 import { check } from 'node-healthz'
