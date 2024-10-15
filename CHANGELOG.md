@@ -8,6 +8,10 @@
 - Latency to the HTML view
 - Logo to readme
 
+### Changed
+
+- Upgraded dev dep express to 4.21.1
+
 ### [2.0.1] 2024-05-31
 
 ### Added
