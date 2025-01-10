@@ -2,7 +2,7 @@
 
 ## [Unreleased]
 
-### [2.0.2] 2024-10-15
+## [2.0.2] 2024-10-15
 
 ### Added
 
@@ -14,13 +14,13 @@
 
 - Upgraded dev dep express to 4.21.1
 
-### [2.0.1] 2024-05-31
+## [2.0.1] 2024-05-31
 
 ### Added
 
 - Reg. exp. support for custom Express.js path
 
-### [2.0.0] 2024-05-21
+## [2.0.0] 2024-05-21
 
 ### Added
 - Custom path for Express.js
