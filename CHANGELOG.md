@@ -4,6 +4,7 @@
 
 ### Changed
 - Refactor HTML serialization
+- Upgrade dev dependencies
 
 ## [2.0.2] 2024-10-15
 
