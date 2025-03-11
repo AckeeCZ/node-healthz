@@ -2,6 +2,9 @@
 
 ## [Unreleased]
 
+### Changed
+- Refactor HTML serialization
+
 ## [2.0.2] 2024-10-15
 
 ### Added
