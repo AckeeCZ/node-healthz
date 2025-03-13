@@ -2,6 +2,9 @@
 
 ## [Unreleased]
 
+### Added
+- Node.js 22 support
+
 ## [2.0.3] 2025-03-13
 
 ### Changed
