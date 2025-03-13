@@ -1,6 +1,6 @@
 {
   "name": "node-healthz",
-  "version": "2.0.2",
+  "version": "2.0.3",
   "description": "The \"health-checkup\" npm package simplifies the process of implementing health checks in Node.js applications, allowing you to ensure the reliability and availability of your system components effortlessly.",
   "keywords": [
     "nodejs",

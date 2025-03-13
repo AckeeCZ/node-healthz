@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [2.0.3] 2025-03-13
+
 ### Changed
 - Refactor HTML serialization
 - Upgrade dev dependencies
