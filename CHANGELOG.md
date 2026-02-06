@@ -5,6 +5,9 @@
 ### Added
 - Node.js 22 support
 
+### Changed
+- Switch to pnpm
+
 ## [2.0.3] 2025-03-13
 
 ### Changed
