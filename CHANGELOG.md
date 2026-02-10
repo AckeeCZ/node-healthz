@@ -3,6 +3,7 @@
 ## [Unreleased]
 
 ### Added
+- Node.js 24 support
 - Node.js 22 support
 
 ### Changed
