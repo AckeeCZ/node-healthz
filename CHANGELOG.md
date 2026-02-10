@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [2.1.0] 2026-02-10
+
 ### Added
 - Node.js 24 support
 - Node.js 22 support
