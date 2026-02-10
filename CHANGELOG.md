@@ -2,6 +2,9 @@
 
 ## [Unreleased]
 
+### Note
+- Remove provenance flag and public access level from npm publish command.
+
 ## [2.1.0] 2026-02-10
 
 ### Added

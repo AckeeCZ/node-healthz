@@ -15,6 +15,4 @@ jobs:
           node-version: '24.x'
           registry-url: 'https://registry.npmjs.org'
       - run: pnpm i --frozen-lockfile
-      - run: pnpm publish --provenance --access public --no-git-checks
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - run: pnpm publish --no-git-checks
